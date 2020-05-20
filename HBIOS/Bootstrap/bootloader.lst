@@ -1,0 +1,54 @@
+0001   0000             ;	v2	25-Jul-2019
+0002   0000             ;	Check console status ready instead of relying on wait to see if this
+0003   0000             ;	allows operation at 20MHz
+0004   0000             ;
+0005   0000             #INCLUDE	"build.inc"
+0001+  0000             ROMSIZE		.EQU		512		; SIZE OF ROM IN KB
+0006   0000             
+0007   0000             CONSTAT	.EQU	$80
+0008   0000             CONDAT	.EQU	$81
+0009   0000             MPGSEL	.EQU	$82
+0010   0000             CLRBS	.EQU	$83
+0011   0000             
+0012   0000             CONRXF	.EQU	$01
+0013   0000             
+0014   0000             START	.EQU	0
+0015   0000             
+0016   F000             	.ORG	$F000
+0017   F000             
+0018   F000             ;	ld	c,CONDAT		;	set up by bootstrap
+0019   F000             ;	xor	a			;	clear a
+0020   F000             ;	ld	b,a			;	set up by bootstrap
+0021   F000             ;	ld	h,a
+0022   F000             ;	ld	l,a
+0023   F000             
+0024   F000 57          	ld	d,a			; d used for page selection as a now overwritten by CONSTAT
+0025   F001             LBOOT:
+0026   F001             ;	inir				; load 256 byte block
+0027   F001 DB 80       	in	a,(CONSTAT)
+0028   F003 E6 01       	and	CONRXF
+0029   F005 28 FA       	jr	z,LBOOT		; wait for RX Full
+0030   F007             
+0031   F007 ED A2       	ini
+0032   F009 20 F6       	jr	nz,LBOOT
+0033   F00B             
+0034   F00B CB 7C       	bit	7,h
+0035   F00D 28 F2       	jr	z,LBOOT			; 32K block
+0036   F00F             	
+0037   F00F             	; reset h for start of next 32K block
+0038   F00F             	; b is always going to be 0 here
+0039   F00F 60          	ld	h,b			
+0040   F010             
+0041   F010 14          	inc	d			; next page
+0042   F011 7A          	ld	a,d
+0043   F012 D3 82       	out	(MPGSEL),a		; set next page
+0044   F014             
+0045   F014 FE 10       	cp	ROMSIZE / 32		; 10 blocks of 32K
+0046   F016 20 E9       	jr	nz,LBOOT
+0047   F018             
+0048   F018 AF          	xor	a			; clear page select
+0049   F019 D3 82       	out	(MPGSEL),a
+0050   F01B C3 00 00    	jp	START
+0051   F01E             
+0052   F01E             	.END
+tasm: Number of errors = 0

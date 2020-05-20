@@ -1,0 +1,103 @@
+------------------
+Final Output Files
+------------------
+
+ROM Output File [512K] -> <config>.rom
+  hbios_rom [32K]
+  OSIMG [32K]
+  OSIMG [32K] (used as filler)
+  OSIMG [32K] (used as filler)
+  romdisk - [384K]
+
+COM Output File -> <config>.com
+  hbios_com [varies]
+  OSIMG [32K]
+
+IMG Output File -> <config>.img
+  hbios_img [varies]
+  OSIMG [32K]
+
+-------------------------
+Intermediate Output Files
+-------------------------
+
+OSIMG [32K] -> osimg.bin
+  romldr [4K]			osldr?
+  dbgmon [4K]			tbasic?
+  CPM (ccp/bdos/cbios) [12K]
+  ZSYS (zcpr/zsdos/cbios) [12K]
+
+CPM [12K] -> cpm.bin
+  ccp [2K]
+  bdos [3.5K]
+  cbios [6.5K]
+
+ZSYS [12K] -> zsys.bin
+  zcpr [2K]
+  zsdos [3.5K]
+  cbios [6.5K]
+
+-----------------
+Compilation Units
+-----------------
+
+hbios.asm -> hbios_rom.bin, hbios_app.bin, hbios_img.bin
+  std.asm
+    ver.inc
+    hbios.inc
+    build.inc
+      <config>.asm
+    plt_<platform>.inc
+  <device drivers>
+  util.asm
+  time.asm
+  bcd.asm
+  dsky.asm
+
+romldr.asm -> romldr.bin:	loader?
+  std.asm
+    ver.inc
+    hbios.inc
+    build.inc
+      <config>.asm
+    plt_<platform>.inc
+  util.asm
+  dsky.asm
+
+dbgmon.asm -> dbgmon.bin:
+  std.asm
+    ver.inc
+    hbios.inc
+    build.inc
+      <config>.asm
+    plt_<platform>.inc
+  util.asm
+  memmgr.asm
+  dsky.asm
+  
+=======================================================================
+HBIOS Loading Modes:
+  ROMBOOT: Startup from ROM Bank BID_BOOT
+  APPBOOT: Startup as CP/M application
+  IMGBOOT: Startup from RAM Bank BID_USR
+=======================================================================
+
+ - If not (APPBOOT), include page 0
+
+ - Base Hardware Init
+   - Iff (ROMBOOT), init BBR
+
+ - Install Proxy
+   - Set CURBNK:
+     - If ROMBOOT, then BID_BOOT, else BID_USR
+
+ - Install HBIOS
+   - Copy from CURBNK:0 --> BID_BIOS:0 ($8000 bytes)
+
+ - Transition to HBIOS in BID_BIOS
+
+ - Copy OS Image to USR Bank
+   - If (ROM_MODE), copy BID_OS:0 --> BID_USR:0
+   - Else, copy BID_USR:<os image start> --> BID_USR:0
+
+ - Chain to BID_USR:0

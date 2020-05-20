@@ -1,0 +1,87 @@
+0001   0000             
+0002   0000             CONDAT	.EQU	$81
+0003   0000             MPGSEL	.EQU	$82
+0004   0000             CLRBS	.EQU	$83
+0005   0000             
+0006   0000             BOOTLOADER	.EQU	$F000
+0007   0000             
+0008   0000             	.ORG	0
+0009   0000             
+0010   0000 21 00 F0    	ld	hl,BOOTLOADER
+0011   0003 0E 81       	ld	c,CONDAT
+0012   0005             
+0013   0005             	;	Bootloader is used to create bootstrap.inc by Build.ps1
+0014   0005             
+0015   0005             #INCLUDE	"bootstrap.inc"
+0001+  0005 ED A2           INI
+0002+  0007 57              .DB  87
+0003+  0008 ED A2           INI
+0004+  000A DB              .DB  219
+0005+  000B ED A2           INI
+0006+  000D 80              .DB  128
+0007+  000E ED A2           INI
+0008+  0010 E6              .DB  230
+0009+  0011 ED A2           INI
+0010+  0013 01              .DB  1
+0011+  0014 ED A2           INI
+0012+  0016 28              .DB  40
+0013+  0017 ED A2           INI
+0014+  0019 FA              .DB  250
+0015+  001A ED A2           INI
+0016+  001C ED              .DB  237
+0017+  001D ED A2           INI
+0018+  001F A2              .DB  162
+0019+  0020 ED A2           INI
+0020+  0022 20              .DB  32
+0021+  0023 ED A2           INI
+0022+  0025 F6              .DB  246
+0023+  0026 ED A2           INI
+0024+  0028 CB              .DB  203
+0025+  0029 ED A2           INI
+0026+  002B 7C              .DB  124
+0027+  002C ED A2           INI
+0028+  002E 28              .DB  40
+0029+  002F ED A2           INI
+0030+  0031 F2              .DB  242
+0031+  0032 ED A2           INI
+0032+  0034 60              .DB  96
+0033+  0035 ED A2           INI
+0034+  0037 14              .DB  20
+0035+  0038 ED A2           INI
+0036+  003A 7A              .DB  122
+0037+  003B ED A2           INI
+0038+  003D D3              .DB  211
+0039+  003E ED A2           INI
+0040+  0040 82              .DB  130
+0041+  0041 ED A2           INI
+0042+  0043 FE              .DB  254
+0043+  0044 ED A2           INI
+0044+  0046 10              .DB  16
+0045+  0047 ED A2           INI
+0046+  0049 20              .DB  32
+0047+  004A ED A2           INI
+0048+  004C E9              .DB  233
+0049+  004D ED A2           INI
+0050+  004F AF              .DB  175
+0051+  0050 ED A2           INI
+0052+  0052 D3              .DB  211
+0053+  0053 ED A2           INI
+0054+  0055 82              .DB  130
+0055+  0056 ED A2           INI
+0056+  0058 C3              .DB  195
+0057+  0059 ED A2           INI
+0058+  005B 00              .DB  0
+0059+  005C ED A2           INI
+0060+  005E 00              .DB  0
+0061+  005F             
+0016   005F             	
+0017   005F AF          	xor	a		; clear a
+0018   0060 47          	ld	b,a		; clear b
+0019   0061 67          	ld	h,a		; clear h
+0020   0062 6F          	ld	l,a		; clear l
+0021   0063             
+0022   0063 C3 FE EF    	jp	BOOTLOADER - 2	;	2 bytes for out instruction
+0023   0066 D3 83       	out	(CLRBS),a
+0024   0068             
+0025   0068             	.END
+0026   0068             	tasm: Number of errors = 0
